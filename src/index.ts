@@ -27,6 +27,13 @@ import {
   sendReceiptSchema, sendReceipt,
 } from "./tools/receipt.js";
 
+import {
+  listPartnersSchema, listPartners,
+  addPartnerSchema, addPartner,
+  removePartnerSchema, removePartner,
+  getPartnerSchema, getPartner,
+} from "./tools/partner.js";
+
 import { sanitizeError } from "./api.js";
 import { loadConfig, saveConfig, initHostedConfig, isHosted } from "./config.js";
 
@@ -262,6 +269,66 @@ function createServer(): McpServer {
     async (params) => {
       try {
         const result = await sendReceipt(params);
+        return { content: [{ type: "text", text: result }] };
+      } catch (e) {
+        return { content: [{ type: "text", text: JSON.stringify({ error: sanitizeError(e) }) }], isError: true };
+      }
+    }
+  );
+
+  // ============================================================
+  // Partner toolok
+  // ============================================================
+
+  server.tool(
+    "list_partners",
+    "Partnerek (vevők) listázása és keresése az elmentett partner törzsből",
+    listPartnersSchema.shape,
+    async (params) => {
+      try {
+        const result = listPartners(params);
+        return { content: [{ type: "text", text: result }] };
+      } catch (e) {
+        return { content: [{ type: "text", text: JSON.stringify({ error: sanitizeError(e) }) }], isError: true };
+      }
+    }
+  );
+
+  server.tool(
+    "add_partner",
+    "Új partner (vevő) hozzáadása vagy meglévő frissítése a partner törzsben",
+    addPartnerSchema.shape,
+    async (params) => {
+      try {
+        const result = addPartner(params);
+        return { content: [{ type: "text", text: result }] };
+      } catch (e) {
+        return { content: [{ type: "text", text: JSON.stringify({ error: sanitizeError(e) }) }], isError: true };
+      }
+    }
+  );
+
+  server.tool(
+    "remove_partner",
+    "Partner törlése a partner törzsből azonosító (id) alapján",
+    removePartnerSchema.shape,
+    async (params) => {
+      try {
+        const result = removePartner(params);
+        return { content: [{ type: "text", text: result }] };
+      } catch (e) {
+        return { content: [{ type: "text", text: JSON.stringify({ error: sanitizeError(e) }) }], isError: true };
+      }
+    }
+  );
+
+  server.tool(
+    "get_partner",
+    "Partner adatinak lekérése azonosító (id) vagy név alapján",
+    getPartnerSchema.shape,
+    async (params) => {
+      try {
+        const result = getPartner(params);
         return { content: [{ type: "text", text: result }] };
       } catch (e) {
         return { content: [{ type: "text", text: JSON.stringify({ error: sanitizeError(e) }) }], isError: true };
