@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { loadConfig, getCompanyApiKey, handlePdf, sanitizeFilename } from "../config.js";
+import { upsertPartner } from "../partners.js";
 import { sendAgentRequest, extractPdfFromXml, extractMetadata, isSuccessResponse, sanitizeResponseXml } from "../api.js";
 import {
   buildCreateInvoiceXml,
@@ -128,6 +129,22 @@ export async function createInvoice(params: z.infer<typeof createInvoiceSchema>)
   const response = await sendAgentRequest("action-xmlagentxmlfile", xml);
   const meta = extractMetadata(response);
   const success = isSuccessResponse(response);
+
+  if (success) {
+    try {
+      upsertPartner({
+        name: params.vevoNev,
+        zip: params.vevoIrsz,
+        city: params.vevoTelepules,
+        address: params.vevoCim,
+        email: params.vevoEmail,
+        taxNumber: params.vevoAdoszam,
+        taxSubject: params.vevoAdpipoalany,
+      });
+    } catch (e) {
+      console.error("Hiba a partner mentésekor:", e);
+    }
+  }
 
   let pdf: { pdfPath?: string; pdfBase64?: string } = {};
   if (success && response.parsedXml) {
