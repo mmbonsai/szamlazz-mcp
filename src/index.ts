@@ -34,6 +34,13 @@ import {
   getPartnerSchema, getPartner,
 } from "./tools/partner.js";
 
+import {
+  saveDraftSchema, saveDraft,
+  listDraftsSchema, listDrafts,
+  getDraftSchema, getDraft,
+  deleteDraftSchema, deleteDraftTool,
+} from "./tools/draft.js";
+
 import { sanitizeError } from "./api.js";
 import { loadConfig, saveConfig, initHostedConfig, isHosted } from "./config.js";
 
@@ -329,6 +336,66 @@ function createServer(): McpServer {
     async (params) => {
       try {
         const result = getPartner(params);
+        return { content: [{ type: "text", text: result }] };
+      } catch (e) {
+        return { content: [{ type: "text", text: JSON.stringify({ error: sanitizeError(e) }) }], isError: true };
+      }
+    }
+  );
+
+  // ============================================================
+  // Piszkozat toolok
+  // ============================================================
+
+  server.tool(
+    "save_draft",
+    "Számla piszkozat mentése vagy frissítése a helyi adatbázisban (nem küld semmit a Számlázz.hu-nak)",
+    saveDraftSchema.shape,
+    async (params) => {
+      try {
+        const result = saveDraft(params);
+        return { content: [{ type: "text", text: result }] };
+      } catch (e) {
+        return { content: [{ type: "text", text: JSON.stringify({ error: sanitizeError(e) }) }], isError: true };
+      }
+    }
+  );
+
+  server.tool(
+    "list_drafts",
+    "Elmentett számla piszkozatok listázása és keresése",
+    listDraftsSchema.shape,
+    async (params) => {
+      try {
+        const result = listDrafts(params);
+        return { content: [{ type: "text", text: result }] };
+      } catch (e) {
+        return { content: [{ type: "text", text: JSON.stringify({ error: sanitizeError(e) }) }], isError: true };
+      }
+    }
+  );
+
+  server.tool(
+    "get_draft",
+    "Elmentett számla piszkozat adatainak lekérése azonosító (id) alapján",
+    getDraftSchema.shape,
+    async (params) => {
+      try {
+        const result = getDraft(params);
+        return { content: [{ type: "text", text: result }] };
+      } catch (e) {
+        return { content: [{ type: "text", text: JSON.stringify({ error: sanitizeError(e) }) }], isError: true };
+      }
+    }
+  );
+
+  server.tool(
+    "delete_draft",
+    "Számla piszkozat törlése a helyi adatbázisból azonosító (id) alapján",
+    deleteDraftSchema.shape,
+    async (params) => {
+      try {
+        const result = deleteDraftTool(params);
         return { content: [{ type: "text", text: result }] };
       } catch (e) {
         return { content: [{ type: "text", text: JSON.stringify({ error: sanitizeError(e) }) }], isError: true };
