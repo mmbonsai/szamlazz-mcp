@@ -118,7 +118,7 @@ export function buildCreateInvoiceXml(
 <xmlszamla xmlns="http://www.szamlazz.hu/xmlszamla" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.szamlazz.hu/xmlszamla xmlszamla.xsd">
   <beallitasok>
     ${tag("szamlaagentkulcs", settings.szamlaagentkulcs)}
-    ${tag("eszamla", settings.eszamla ?? true)}
+    ${tag("eszamla", settings.eszamla ?? false)}
     ${tag("kulcstartojelszo", settings.kulcstartojelszo)}
     ${tag("szamlaLetoltes", settings.szamlaLetoltes ?? true)}
     ${tag("szamlaLetoltesPld", settings.szamlaLetoltesPld)}
@@ -188,6 +188,8 @@ export interface ReverseInvoiceParams {
   szamlaLetoltes?: boolean;
   szamlaLetoltesPld?: number;
   valaszVerzio?: number;
+  sendEmail?: boolean;
+  vevoEmail?: string;
 }
 
 export function buildReverseInvoiceXml(params: ReverseInvoiceParams): string {
@@ -208,7 +210,9 @@ export function buildReverseInvoiceXml(params: ReverseInvoiceParams): string {
     ${tag("tipus", params.tipus ?? "SS")}
   </fejlec>
   <elado/>
-  <vevo/>
+  <vevo>
+    ${tag("email", params.vevoEmail)}
+  </vevo>
 </xmlszamlast>`;
 }
 

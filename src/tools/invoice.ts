@@ -50,7 +50,7 @@ export const createInvoiceSchema = z.object({
   vegszamla: z.boolean().optional().describe("Végszámla"),
   helyesbitoszamla: z.boolean().optional().describe("Helyesbítő számla"),
   helyesbitettSzamlaszam: z.string().optional().describe("Helyesbített számla száma"),
-  eszamla: z.boolean().optional().describe("E-számla (alapértelmezett: true)"),
+  eszamla: z.boolean().optional().describe("E-számla (alapértelmezett: false, papíralapú)"),
   kulcstartojelszo: z.string().optional().describe("Kulcstartó jelszó e-számlához"),
   arfolyamBank: z.string().optional().describe("Árfolyam bank (deviza számlánál, pl. 'MNB')"),
   arfolyam: z.number().optional().describe("Árfolyam (deviza számlánál, 0 = MNB aktuális)"),
@@ -175,6 +175,7 @@ export const reverseInvoiceSchema = z.object({
   teljesitesDatum: dateField("Sztornó teljesítés dátuma (YYYY-MM-DD)"),
   eszamla: z.boolean().optional().describe("E-számla (alapértelmezett: true)"),
   kulcstartojelszo: z.string().optional().describe("Kulcstartó jelszó"),
+  vevoEmail: z.string().optional().describe("Vevő e-mail címe az értesítő kiküldéséhez"),
 });
 
 export async function reverseInvoice(params: z.infer<typeof reverseInvoiceSchema>): Promise<string> {
@@ -188,6 +189,7 @@ export async function reverseInvoice(params: z.infer<typeof reverseInvoiceSchema
     teljesitesDatum: params.teljesitesDatum,
     eszamla: params.eszamla,
     kulcstartojelszo: params.kulcstartojelszo,
+    vevoEmail: params.vevoEmail,
     szamlaLetoltes: true,
     valaszVerzio: 2,
   });
